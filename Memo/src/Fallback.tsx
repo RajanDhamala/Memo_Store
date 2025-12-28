@@ -8,7 +8,7 @@ interface Particle {
   speed: number;
 }
 
-export default function Fallback(): JSX.Element {
+export default function Fallback() {
   const [glitch, setGlitch] = useState<boolean>(false);
   const [particles, setParticles] = useState<Particle[]>([]);
 
@@ -118,7 +118,7 @@ export default function Fallback(): JSX.Element {
         />
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes gridMove {
           0% { transform: translate(0, 0); }
           100% { transform: translate(50px, 50px); }

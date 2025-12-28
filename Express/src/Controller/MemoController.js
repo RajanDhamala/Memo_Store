@@ -9,7 +9,6 @@ import fs from "fs";
 import path from "path";
 dotenv.config()
 
-
  const CreateFolder = asyncHandler(async (req, res) => {
   const { folderName } = req.body;
   if (!folderName || !req.user) {
@@ -106,9 +105,6 @@ const FolderList = asyncHandler(async (req, res) => {
 
   return res.send(new ApiResponse(200, "Fetched the folder list", userFolderList));
 });
-
-
-
 
 const FileInFolder = asyncHandler(async (req, res) => {
   const { folderId } = req.params;
@@ -238,7 +234,6 @@ const editFileLine = asyncHandler(async (req, res) => {
 });
 
 
-
 const editFolderOrFileName = asyncHandler(async (req, res) => {
   const { type, editId, title } = req.body;
   console.log(req.body)
@@ -320,7 +315,6 @@ const GetLines = asyncHandler(async (req, res) => {
 
 
 
-
 const FileUpload = asyncHandler(async (req, res) => {
   const file = req.file;
   const { password } = req.body;
@@ -358,9 +352,6 @@ const FileUpload = asyncHandler(async (req, res) => {
   });
 });
 
-
-
-
 const DownloadFile = asyncHandler(async (req, res) => {
   const { fileId, password } = req.body;
   if (!fileId) throw new ApiError(400, "Please include fileId in request");
@@ -391,8 +382,6 @@ const DownloadFile = asyncHandler(async (req, res) => {
     }
   });
 });
-
-
 
 const fileList = asyncHandler(async (req, res) => {
   const { page = 1 } = req.query; 
@@ -439,7 +428,6 @@ const fileList = asyncHandler(async (req, res) => {
     files,
   });
 });
-
 
 export {
   CreateFile,CreateFolder,AddLine,FolderList,FileInFolder,deleteFolder,deleteFile,deleteLine,editFileLine

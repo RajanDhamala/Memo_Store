@@ -173,7 +173,7 @@ export const useMemoStore = create<MemoStore>((set, get) => ({
       id: `line-${Date.now()}`,
       content,
     }
-    const request=await axios.post(`http://localhost:8000/memo/addLine`,{
+    await axios.post(`http://localhost:8000/memo/addLine`,{
         fileId:fileId,
     folderId:folderId,
     content:content

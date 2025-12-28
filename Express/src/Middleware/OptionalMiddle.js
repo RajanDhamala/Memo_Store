@@ -8,7 +8,7 @@ dotenv.config();
 
 const OptionalAuthUser = asyncHandler(async (req, res, next) => {
   const { accessToken, refreshToken } = req.cookies;
-
+  console.log("OptionalAuthUser middleware invoked");
   if (!accessToken && !refreshToken) {
     req.user = { id: null, role: "anonymous" };
     return next();

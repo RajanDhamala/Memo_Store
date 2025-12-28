@@ -55,19 +55,9 @@ interface FileWithLines {
   lines: Line[];
 }
 
-interface Folder {
-  id: string;
-  name: string;
-  ownerId: string;
-  createdAt: string;
-  updatedAt: string;
-  _count: {
-    files: number;
-  };
-  files: FileMetadata[];
-}
 
-export function FilesView() {
+
+export default function FilesView() {
   const { folderId } = useParams<{ folderId: string }>();
   const { selectedFolder, selectedFile, setSelectedFolder, setSelectedFile } = useMemoStore();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -157,12 +147,10 @@ export function FilesView() {
   }
 
   const fetchFiles = async () => {
-    console.log("Fetching files metadata for folder:", folderId);
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/memo/file_folder/${folderId}`, {
         withCredentials: true,
       });
-      console.log("Files metadata fetched:", response.data.data);
       return response.data.data as FileMetadata[];
     } catch (err) {
       console.error("Error fetching files:", err);
@@ -171,12 +159,10 @@ export function FilesView() {
   };
 
   const fetchFileWithLines = async (fileId: string) => {
-    console.log("Fetching file with lines:", fileId);
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/memo/getLines/${fileId}`, {
         withCredentials: true,
       });
-      console.log("File with lines fetched:", response.data.data);
       return response.data.data as FileWithLines;
     } catch (err) {
       console.error("Error fetching file lines:", err);
@@ -189,6 +175,8 @@ export function FilesView() {
     queryFn: fetchFiles,
     enabled: !!folderId,
     retry: false,
+    staleTime: 3 * 60 * 1000, // 3 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   const { 
@@ -200,6 +188,8 @@ export function FilesView() {
     queryFn: () => fetchFileWithLines(selectedFile!.id),
     enabled: !!selectedFile?.id,
     retry: false,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const createFileMutation = useMutation({
@@ -341,32 +331,31 @@ export function FilesView() {
   });
 
   useEffect(() => {
-    if (folderId && filesData) {
-      console.log("Updating selectedFolder with files:", filesData);
-      if (
-        !selectedFolder ||
-        selectedFolder.id !== folderId ||
-        JSON.stringify(selectedFolder.files) !== JSON.stringify(filesData)
-      ) {
+    if (folderId && filesData && filesData.length > 0) {
+      // Only update if folder ID changed or files data is significantly different
+      if (!selectedFolder || selectedFolder.id !== folderId) {
+        const filesWithLines = filesData.map(file => ({
+          id: file.id,
+          title: file.title,
+          createdAt: file.createdAt,
+          updatedAt: file.updatedAt,
+          lines: [] // Empty lines array as required by File interface
+        }));
         setSelectedFolder({
           id: folderId,
           name: selectedFolder?.name || "Folder",
-          ownerId: selectedFolder?.ownerId || "",
           createdAt: selectedFolder?.createdAt || new Date().toISOString(),
           updatedAt: selectedFolder?.updatedAt || new Date().toISOString(),
-          _count: { files: filesData.length },
-          files: filesData,
+          files: filesWithLines,
         });
       }
     }
-  }, [folderId, filesData, setSelectedFolder]);
+  }, [folderId, filesData, selectedFolder, setSelectedFolder]);
 
   const handleFileClick = (file: FileMetadata) => {
-    console.log("File clicked:", file.id, file.title);
     setSelectedFile({
       id: file.id,
       title: file.title,
-      folderId: file.folderId,
       createdAt: file.createdAt,
       updatedAt: file.updatedAt,
       lines: []
@@ -530,7 +519,7 @@ export function FilesView() {
           </div>
           <div className="text-center py-12">
             <p className="text-red-400">
-              {fileError.response?.data?.message || "Error loading file content. Please try again."}
+              {(fileError as any)?.response?.data?.message || "Error loading file content. Please try again."}
             </p>
           </div>
         </div>
@@ -815,7 +804,7 @@ export function FilesView() {
       {filesError && (
         <div className="text-center py-4">
           <p className="text-red-400">
-            {filesError.response?.data?.message || "Error fetching files. Please try again later."}
+            {(filesError as any)?.response?.data?.message || "Error fetching files. Please try again later."}
           </p>
         </div>
       )}

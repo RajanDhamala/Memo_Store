@@ -3,8 +3,8 @@
 
 import { useEffect } from "react"
 import { useMemoStore } from "./memo-store"
-import { FoldersView } from "./Folders.tsx"
-import { FilesView } from "./Files.tsx"
+import FoldersView from "./Folders.tsx"
+import FilesView from "./Files.tsx"
 import { Loader2 } from "lucide-react"
 
 export default function ParentPage() {

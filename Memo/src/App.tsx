@@ -1,19 +1,22 @@
 
 import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Landing from "./Pages/Landing";
 import Fallback from "./Fallback";
-import LoginPage from "./Pages/Login";
-import RegisterPage from "./Pages/Register";
-import ForgotPasswordPage from "./Pages/ForgotPassword";
 import { Toaster } from "react-hot-toast";
 import useUserStore from "./ZustandStore/UserStore.ts"; // your Zustand store
-import { FoldersView } from "./Comps/Folders.tsx";
-import { FilesView } from "./Comps/Files.tsx";
-import ResetPasswordPage from "./Pages/ResetPassword.tsx";
-import UploadFilePage from "./Pages/UploadFile.tsx";
 import ProtectedRoute from "./ProtectedRoutes.tsx";
 import { useState } from "react";
+import {
+  LazyLogin,
+  LazyRegister,
+  LazyResetPassword,
+  LazyForgotPassword,
+  LazyUpload,
+  LazyLanding,
+  LazyFolder,
+  LazyFile,
+} from "./LazyLoading/LazyLoading";
+
 
 function App() {
   const { setIsAuthenticated, setCurrentUser, isAuthenticated } = useUserStore();
@@ -55,18 +58,18 @@ function App() {
       <Toaster position="top-right" />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/upload" element={<UploadFilePage />} />
+          <Route path="/" element={<LazyLanding/>} />
+          <Route path="/login" element={<LazyLogin />} />
+          <Route path="/register" element={<LazyRegister />} />
+          <Route path="/forgot-password" element={<LazyForgotPassword />} />
+          <Route path="/reset-password" element={<LazyResetPassword />} />
+          <Route path="/upload" element={<LazyUpload />} />
           <Route path="*" element={<Fallback />} />
 
           {/* Protected */}
           <Route element={<ProtectedRoute isAuth={isAuthenticated} />}>
-            <Route path="/memo" element={<FoldersView />} />
-            <Route path="/memo/:folderId" element={<FilesView />} />
+            <Route path="/memo" element={<LazyFolder/>} />
+            <Route path="/memo/:folderId" element={<LazyFile/>} />
           </Route>
         </Routes>
       </BrowserRouter>

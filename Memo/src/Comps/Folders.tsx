@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import type { AxiosError } from "axios";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { FolderIcon, Plus, Trash2, Edit2, MoreVertical, Upload } from "lucide-react";
 import {
@@ -53,7 +54,7 @@ interface Folder {
   files: File[];
 }
 
-export function FoldersView() {
+export default function FoldersView() {
   const { setSelectedFolder } = useMemoStore();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -65,20 +66,19 @@ export function FoldersView() {
   const navigate = useNavigate();
 
   // Fetch folder list
-  const fetchFolderList = async () => {
-    console.log("Fetching folder list...");
-    const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/memo/folders`, {
-      withCredentials: true,
-    });
-    return response.data.data.map((folder: Folder) => ({ ...folder, files: [] })) as Folder[];
-  };
-
-  const { data: folderData = [], isLoading, error } = useQuery({
-    queryKey: ["folders", "list"],
-    queryFn: fetchFolderList,
-    retry: false,
+const fetchFolderList = async (): Promise<Folder[]> => {
+  const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/memo/folders`, {
+    withCredentials: true,
   });
 
+  return response.data.data.map((folder: Folder) => ({ ...folder, files: [] }));
+};
+
+const { data: folderData = [], isLoading, error } = useQuery<Folder[], AxiosError>({
+  queryKey: ["folders", "list"],
+  queryFn: fetchFolderList,
+  retry: false,
+});
   // Create folder mutation
   const createFolderMutation = useMutation({
     mutationFn: async (folderName: string) => {
@@ -144,7 +144,6 @@ export function FoldersView() {
   });
 
   const handleFolderClick = (folder: Folder) => {
-    console.log("Folder clicked:", folder.id, folder.name);
     setSelectedFolder({ ...folder, files: [] });
     navigate(`/memo/${folder.id}`);
   };
@@ -337,7 +336,7 @@ export function FoldersView() {
       ) : error ? (
         <div className="text-center py-12">
           <p className="text-red-400">
-            {error.response?.data?.message || "Error fetching folders. Please try again later."}
+            {(error as any)?.response?.data?.message || "Error fetching folders. Please try again later."}
           </p>
         </div>
       ) : folderData.length === 0 ? (

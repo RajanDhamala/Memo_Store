@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Folder, Smartphone, Share2, Lock, Database, Globe, Star, Users, Zap, CheckCircle, Play, ArrowRight, Download, Settings, Eye, Clock, Award, TrendingUp, LogOut } from 'lucide-react';
+import { Shield, Folder, Smartphone, Share2, Lock, Database, Globe, Star, Users, Play, ArrowRight, Download, Settings, Eye, Clock, Award, TrendingUp, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import useUserStore from '@/ZustandStore/UserStore';
 import axios from 'axios';
@@ -28,41 +28,7 @@ const TestimonialCard: React.FC<TestimonialProps> = ({ name, role, company, cont
   </div>
 );
 
-interface PricingPlanProps {
-  name: string;
-  price: string;
-  period: string;
-  features: string[];
-  popular?: boolean;
-}
 
-const PricingCard: React.FC<PricingPlanProps> = ({ name, price, period, features, popular = false }) => (
-  <div className={`bg-gray-900/50 p-8 rounded-2xl border backdrop-blur-sm relative ${popular ? 'border-purple-500 scale-105' : 'border-gray-800'}`}>
-    {popular && (
-      <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-        <span className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
-          Most Popular
-        </span>
-      </div>
-    )}
-    <div className="text-center mb-8">
-      <h3 className="text-2xl font-bold text-white mb-2">{name}</h3>
-      <div className="text-4xl font-black text-white mb-2">${price}</div>
-      <p className="text-gray-400">per {period}</p>
-    </div>
-    <ul className="space-y-4 mb-8">
-      {features.map((feature, index) => (
-        <li key={index} className="flex items-center text-gray-300">
-          <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-          {feature}
-        </li>
-      ))}
-    </ul>
-    <Button className="w-full" variant={popular ? 'primary' : 'secondary'}>
-      Choose Plan
-    </Button>
-  </div>
-);
 
 interface StatsProps {
   number: string;
@@ -187,7 +153,7 @@ const Header: React.FC = () => {
                     Sign In
                   </Button>
                 </Link>
-                <Link to={'/signup'} className="w-full sm:w-auto">
+                <Link to={'/register'} className="w-full sm:w-auto">
                   <Button variant="primary" className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base sm:px-6 sm:py-3">
                     Sign Up
                   </Button>
@@ -298,7 +264,6 @@ const downloadApp = async (id:String) => {
 
 
   const handleLearnMore = (): void => {
-    console.log('Navigate to learn more');
   };
 
   return (
@@ -566,7 +531,7 @@ const downloadApp = async (id:String) => {
         </footer>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes fade-in {
           from { opacity: 0; transform: translateY(30px); }
           to { opacity: 1; transform: translateY(0); }

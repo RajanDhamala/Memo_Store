@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
 import toast from "react-hot-toast";
 
-const ProtectedRoute = ({ isAuth }) => {
+const ProtectedRoute = ({ isAuth }: { isAuth: boolean }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
