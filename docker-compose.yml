@@ -1,0 +1,108 @@
+services:
+  frontend:
+    build:
+      context: ./Memo
+      target: production
+    ports:
+      - "80:80"
+    depends_on:
+      - backend1
+      - backend2
+      - backend3
+    networks:
+      - appnet
+
+  backend1:
+    build:
+      context: ./Express
+    env_file:
+      - ./Express/.env
+    volumes:
+      - shared-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - appnet
+
+  backend2:
+    build:
+      context: ./Express
+    env_file:
+      - ./Express/.env
+    volumes:
+      - shared-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - appnet
+
+  backend3:
+    build:
+      context: ./Express
+    env_file:
+      - ./Express/.env
+    volumes:
+      - shared-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - appnet
+
+  # Loki (log storage)
+  loki:
+    image: grafana/loki:2.9.2
+    container_name: loki
+    command: -config.file=/etc/loki/local-config.yaml
+    user: "0:0"
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+      - loki-data:/tmp/loki
+    networks:
+      - appnet
+
+  # Promtail (log collector)
+  promtail:
+    image: grafana/promtail:2.9.2
+    container_name: promtail
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - /var/log:/var/log      # host logs
+      - /var/run/docker.sock:/var/run/docker.sock  # Docker container logs
+      - ./promtail-config.yaml:/etc/promtail/config.yml
+    networks:
+      - appnet
+    depends_on:
+      - loki
+
+  # Grafana (dashboard)
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - appnet
+    depends_on:
+      - loki
+
+volumes:
+  shared-data:
+  grafana-data:
+  loki-data:
+
+networks:
+  appnet:
+    driver: bridge
